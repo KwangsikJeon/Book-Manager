@@ -31,6 +31,7 @@ int menu_print()
 
     while(1)
     {
+        printf("============================\n");
         printf("\n");
         printf("1.  Insert\n");
         printf("2.  List\n");
