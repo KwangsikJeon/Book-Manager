@@ -1,21 +1,9 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <fcntl.h>              /* oflag를 사용하기 위해서 포함. */
-
-#include "file_io.h"
-
-#pragma pack(1)                 /* 구조체를 1바이트 단위로 채워 넣는다. */
-
-typedef struct dbf_header       /* 데이터 파일의 헤더를 위한 버퍼 */
-{
-    int amount_of_book;         /* 총 입력된 파일의 권 수. */
-    char magic_number[30];      /* Asterisk로 이루어진 총 30바이트의 공간 */
-    /* 헤더 파일은 위에 명시된 것과 같이 총 34바이트를 차지하게 된다. */
-} DBF_HEADER;
-
+#include "header_files.h"
 
 void writing_data_file(BOOK_NODE *books)           /*  저 수준 파일 입출력을 통한 데이터 파일 생성 함수 */
 {
+    char turple = '|';            /* 터플 */
+    
     int infd;
     char buffer[40];
     
@@ -31,8 +19,23 @@ void writing_data_file(BOOK_NODE *books)           /*  저 수준 파일 입출�
     }
 
     read(infd, buffer, 34);            /* 헤더 데이터 바로 다음 위치인 35바이트에 위치 시킨다. */
-    write(infd, books, sizeof(BOOK_NODE)); /* 버퍼에 있는 내용을 파일에 쓴다. */
-    
+
+    while(1)                    /* 도서목록을 파일에 쓰기 위한 루틴. */
+    {
+        write(infd, books, (sizeof(BOOK_NODE) - 4)); /* 버퍼에 있는 내용을 파일에 쓴다. */
+
+        read(infd, buffer, +1);  /* 터플을 쓰기 위해 1바이트 앞으로 간다. */
+        write(infd, &turple, 1); /* 미리 선언된 터플을 파일에 쓴다. */
+        
+        if(books -> next == NULL) /* 목록의 끝인지를 판단 */
+        {
+            break;              /* 끝이면 저장 끝 */
+        }
+        else
+        {
+            books = books -> next;
+        }
+    }
     close(infd);                /* 파일 속성을 시스템에 알리기 위해서 한 번 닫았다가 연다. */
 
 }
@@ -46,7 +49,7 @@ void INIT_writing_header()      /* 새로 생성된 데이터 파일에 헤더�
     /* 쓰기전용으로 파일을 연다. */
 /* //    outfd = open("book.dbf", O_WRONLY | O_BINATY); /\* 바이너리 형태의 쓰기 전용으로 파일을 연다. *\/ */
 
-    outfd = open("book.dbf", O_CREAT | O_WRONLY); /* 바이너리 형태의 쓰기 전용으로 파일을 연다. */
+    outfd = open("book.dbf", O_CREAT | O_TRUNC | O_WRONLY); /* 바이너리 형태의 쓰기 전용으로 파일을 새로 만든다. */
     if(outfd < 0)                                  /* 파일열기를 실패했을땐 종료. */
     {
         printf("Failed to open the file for writing.\n");

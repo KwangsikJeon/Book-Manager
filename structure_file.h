@@ -11,15 +11,14 @@ typedef struct dbf_header       /* 데이터 파일의 헤더를 위한 버퍼 *
     /* 헤더 파일은 위에 명시된 것과 같이 총 34바이트를 차지하게 된다. */
 } DBF_HEADER;
 
-typedef struct booktype         /*  책의 기본 구조체 */
+typedef struct booktype_node         /*  책의 기본 구조체 */
 {
     char book[30];
     char author[15];
     char publisher[15];
     char price[15];
     char year[15];
-    struct booktype *next;
+    struct booktype_node *next;
 } BOOK_NODE;
-
 
 #endif // __STRUCTURE_FILE_H__

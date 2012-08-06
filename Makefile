@@ -1,7 +1,8 @@
-CC = gcc
+CC = gcc -g
 OBJECTS = main.o \
 	file_io.o \
-	linked_list_function.o 	
+	functions.o \
+	linked_list_function.o 
 
 all: BEGIN $(OBJECTS)
 	@$(CC) -o main $(OBJECTS)
@@ -12,6 +13,9 @@ BEGIN:
 
 main.o : main.c
 	@$(CC) -c main.c
+
+functions.o : functions.c
+	@$(CC) -c functions.c
 
 file_io.o : file_io.c
 	@$(CC) -c file_io.c
