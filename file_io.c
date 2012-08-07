@@ -54,7 +54,7 @@ void INIT_writing_header(unsigned int amount_of_books)      /* 새로 생성된 
     int outfd;
 
     /* 쓰기전용으로 파일을 연다. */
-/* //    outfd = open("book.dbf", O_WRONLY | O_BINATY); /\* 바이너리 형태의 쓰기 전용으로 파일을 연다. *\/ */
+/* //    outfd = open("book.dbf", O1_WRONLY | O_BINATY); /\* 바이너리 형태의 쓰기 전용으로 파일을 연다. *\/ */
 
     outfd = open("book.dbf", O_CREAT | O_TRUNC | O_WRONLY); /* 바이너리 형태의 쓰기 전용으로 파일을 새로 만든다. */
     if(outfd < 0)                                  /* 파일열기를 실패했을땐 종료. */
@@ -72,7 +72,7 @@ void INIT_writing_header(unsigned int amount_of_books)      /* 새로 생성된 
 BOOK_NODE *loading_data_file(BOOK_NODE *data)     /* 파일을 불러 들인다. */
 {
     BOOK_NODE temp;
-    BOOK_NODE *temp_return;     /* 리턴용 변수 */
+    BOOK_NODE *temp_return = data;     /* 리턴용 변수 */
 
     int amount_books;
     int infd;                   /* 파일 핸들러 */
@@ -92,18 +92,14 @@ BOOK_NODE *loading_data_file(BOOK_NODE *data)     /* 파일을 불러 들인다.
         
         lseek(infd, 1 * sizeof(DBF_HEADER), SEEK_SET); /* 헤더 부분 만큼 지나간다. */
 
-        /* 현재 아래 부분 문제 있음. */
-        for(i_counter = 1; amount_books >= i_counter; ++i_counter)
+        for(i_counter = 1; amount_books >= i_counter; ++i_counter) /* 파일에서 데이터 구조체 단위로 뽑아서 메모리 적재 */
         {
-            read(infd, &temp, sizeof(BOOK_NODE));
-
-            temp_return = insert(&temp, data);
-            printf("%s\n",temp_return -> book);
+            read(infd, &temp, sizeof(BOOK_NODE)); /* 데이터를 읽어서, 구조체에 넣는다. */
+            temp_return = insert(&temp, temp_return); /* linked list에 넣고 반환되는 첫 NODE 주소를 대입. */
         }
-                                   
     }
 
-    return temp_return;
+    return temp_return;         /* 첫 NODE의 시작 값을 반환한다. */
 }
 
 unsigned int checking_header(int *infd) /* 헤더를 검사하고 return 값으로 레코드 갯수를 반환한다. */
