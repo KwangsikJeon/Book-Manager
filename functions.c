@@ -4,9 +4,10 @@ BOOK_NODE *main_list = NULL; /* 이 변수는 반드시 도서목록 연결 리�
 
 int menu_print()
 {
-
     int choisen_menu_number;  /* 선택된 메뉴번호를 저장하는 변수 */
 
+    main_list = loading_data_file(main_list); /* 기본 데이터 파일인 "book.dbf"을 부른다. */
+        
     while(1)                    /* 메뉴는 종료를 선택할 때까지 반복해서 출력된다. */
     {
         printf("1.  Insert\n");

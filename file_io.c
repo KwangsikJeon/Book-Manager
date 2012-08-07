@@ -2,6 +2,8 @@
 
 void writing_data_file(BOOK_NODE *books)           /*  저 수준 파일 입출력을 통한 데이터 파일 생성 함수 */
 {
+    DBF_HEADER header;
+    
     char turple = '|';            /* 터플 */
     
     int infd;
@@ -9,7 +11,9 @@ void writing_data_file(BOOK_NODE *books)           /*  저 수준 파일 입출�
     
 //  infd = open("book.dbf", O_CREAT | O_RDWR | O_BINARY); /* DOS 용. */
 
-    INIT_writing_header();      /* 헤더 삽입 함수 */
+    header.amount_of_book = counting_links(books); /* counting_links 함수가 링크 수를 세어서 대입 */
+    INIT_writing_header(header.amount_of_book);      /* 헤더 삽입 함수, 책의 권 수도 함께 삽입 */
+    
     
     infd = open("book.dbf", O_RDWR); /* 리눅스용 */
     if(infd < 0)
@@ -22,9 +26,10 @@ void writing_data_file(BOOK_NODE *books)           /*  저 수준 파일 입출�
 
     while(1)                    /* 도서목록을 파일에 쓰기 위한 루틴. */
     {
-        write(infd, books, (sizeof(BOOK_NODE) - 4)); /* 버퍼에 있는 내용을 파일에 쓴다. */
+        /* write(infd, books, (sizeof(BOOK_NODE) - 4)); /\* 버퍼에 있는 내용을 파일에 쓴다. *\/ */
+        write(infd, books, (sizeof(BOOK_NODE))); /* 버퍼에 있는 내용을 파일에 쓴다. */
 
-        read(infd, buffer, +1);  /* 터플을 쓰기 위해 1바이트 앞으로 간다. */
+        lseek(infd, -1, SEEK_CUR); /* 데이터 구조체 멤버 next의 자리를 사용한다. */
         write(infd, &turple, 1); /* 미리 선언된 터플을 파일에 쓴다. */
         
         if(books -> next == NULL) /* 목록의 끝인지를 판단 */
@@ -36,14 +41,16 @@ void writing_data_file(BOOK_NODE *books)           /*  저 수준 파일 입출�
             books = books -> next;
         }
     }
-    close(infd);                /* 파일 속성을 시스템에 알리기 위해서 한 번 닫았다가 연다. */
+    close(infd);                /* 파일을 닫는다. */
 
 }
 
-void INIT_writing_header()      /* 새로 생성된 데이터 파일에 헤더정보를 쓴다. */
+void INIT_writing_header(unsigned int amount_of_books)      /* 새로 생성된 데이터 파일에 헤더정보를 쓴다. */
 {
     DBF_HEADER header = {0, "******************************"}; /* 구조체 초기화 별은 30개*/
 
+    header.amount_of_book = amount_of_books; /* 책의 갯수 대입한다. */
+    
     int outfd;
 
     /* 쓰기전용으로 파일을 연다. */
@@ -62,3 +69,74 @@ void INIT_writing_header()      /* 새로 생성된 데이터 파일에 헤더�
     close(outfd);               /* 파일을 닫는다. */
 }
 
+BOOK_NODE *loading_data_file(BOOK_NODE *data)     /* 파일을 불러 들인다. */
+{
+    BOOK_NODE temp;
+    BOOK_NODE *temp_return;     /* 리턴용 변수 */
+
+    int amount_books;
+    int infd;                   /* 파일 핸들러 */
+
+    int i_counter;
+           
+    amount_books = checking_header(&infd); /* 헤더 검사를 한다. */
+    if(amount_books < 0)                  /* 헤더 검사에서 오류 */
+    {
+        printf("The data file might be broken. Please check the file. \n");
+        return;
+    }
+    else
+    {
+        printf("Debugging, File Checking :: [OK]\n");
+        printf("Debugging, Amount of books :: [%d]\n", amount_books);
+        
+        lseek(infd, 1 * sizeof(DBF_HEADER), SEEK_SET); /* 헤더 부분 만큼 지나간다. */
+
+        /* 현재 아래 부분 문제 있음. */
+        for(i_counter = 1; amount_books >= i_counter; ++i_counter)
+        {
+            read(infd, &temp, sizeof(BOOK_NODE));
+
+            temp_return = insert(&temp, data);
+            printf("%s\n",temp_return -> book);
+        }
+                                   
+    }
+
+    return temp_return;
+}
+
+unsigned int checking_header(int *infd) /* 헤더를 검사하고 return 값으로 레코드 갯수를 반환한다. */
+{
+    DBF_HEADER header_temp;
+
+    unsigned int amountBooks = 0;
+    char magic_key_from_file[31];
+    char buffer[31] = {"******************************"}; /* 헤더검사를 위한 매직 키,
+                                                           * 자동으로 들어갈 NULL 자리를 비워 둠 */
+    *infd = open("book.dbf", O_RDWR); /* 파일을 불러온다. */
+    if(infd < 0)                     /* 실패했다면 에러 메세지를 출력 후 함수를 종료. */
+    {
+        perror("Failed to open the file :: ");
+        return;
+    }
+    read(*infd, &header_temp, sizeof(DBF_HEADER)); /* 헤더 부분에서 매직 키에 접근. */
+    amountBooks = header_temp.amount_of_book;         /* 갯수를 대입 */
+    
+    printf("Debugging, Returning of the record :: [%d]\n", header_temp.amount_of_book);
+    
+    strcpy(magic_key_from_file, header_temp.magic_number); /* 매직키를 추출하여 준비된 배열에 넣는다. */
+    magic_key_from_file[30] = '\0';                        /* 마지막에 NULL을 넣어서 garbage 값을 방지 */
+    
+    if(0 == strcmp(magic_key_from_file, buffer)) /* 주어진 매직 키와 파일에서 추출한 키와 비교한다.  */
+    {
+        /* return header_temp.amount_of_book; /\* 올바른 데이터 파일일 경우, 레코드 갯수를 반환 *\/ */
+        return amountBooks; /* 올바른 데이터 파일일 경우, 레코드 갯수를 반환 */
+    }
+    else
+    {
+        return -1;               /* 데이터 파일에 이상이 있을 경우 */
+    }
+
+    return -1;
+}

@@ -69,3 +69,21 @@ void *print_links(BOOK_NODE *linked_list)
     return;
 }
 
+unsigned int counting_links(BOOK_NODE *books) /* linked list의 NODE 갯수를 세어서 반환한다. */
+{
+    int ui_counter = 0;
+
+    while(1)
+    {
+        if(books == NULL)
+        {
+            break;
+        }
+        else
+        {
+            ui_counter = ui_counter + 1;
+            books = books -> next;
+        }
+    }
+    return ui_counter;
+}
