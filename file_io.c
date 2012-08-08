@@ -56,7 +56,7 @@ void INIT_writing_header(unsigned int amount_of_books)      /* 새로 생성된 
     /* 쓰기전용으로 파일을 연다. */
 /* //    outfd = open("book.dbf", O1_WRONLY | O_BINATY); /\* 바이너리 형태의 쓰기 전용으로 파일을 연다. *\/ */
 
-    outfd = open("book.dbf", O_CREAT | O_TRUNC | O_WRONLY); /* 바이너리 형태의 쓰기 전용으로 파일을 새로 만든다. */
+    outfd = open("book.dbf", O_CREAT | O_TRUNC | O_RDWR, S_IREAD | S_IWRITE); /* 바이너리 형태의 쓰기 전용, 읽고 쓰기 가능 파일을 새로 만든다. */
     if(outfd < 0)                                  /* 파일열기를 실패했을땐 종료. */
     {
         printf("Failed to open the file for writing.\n");
@@ -78,12 +78,22 @@ BOOK_NODE *loading_data_file(BOOK_NODE *data)     /* 파일을 불러 들인다.
     int infd;                   /* 파일 핸들러 */
 
     int i_counter;
-           
+
+    infd = open("book.dbf", O_RDWR); /* 파일 존재 여부를 검사. 이 부분이 없으면 garbage 값을 가지고 linked list에 접근 */
+    if(infd == -1)                   /* 파일이 없으면 -1 가지게 되는 -1 과 비교 */
+    {
+        printf("There is no data file, \"book.dbf\" or failed to open the file.\n");
+        close(infd);
+        
+        return temp_return;     /* NULL 값을 다시 돌려주고 함수 종료. */
+    }
+
+        
     amount_books = checking_header(&infd); /* 헤더 검사를 한다. */
     if(amount_books < 0)                  /* 헤더 검사에서 오류 */
     {
         printf("The data file might be broken. Please check the file. \n");
-        return;
+        return temp_return;     /* NULL 값을 돌려주고 함수 종료. */
     }
     else
     {
