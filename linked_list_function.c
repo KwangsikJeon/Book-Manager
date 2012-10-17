@@ -20,8 +20,6 @@ BOOK_NODE *insert(BOOK_NODE *book_st, BOOK_NODE *list)
     }
     *newnode = *book_st;          /* 새로운 노드에 입력 받았던 내용을 넣는다. */
 
-    printf("Debugging :: [[%s]]\n", newnode -> book); /* 디버깅용 printf. 내용을 잘 받았는지 검사. */
-      
     /* 삽입 위치로 이동 */
     while((current != NULL) && (current -> book < book_st -> book)) /* 처음이 아니고, 오름차순으로.  */
     {
@@ -39,7 +37,6 @@ BOOK_NODE *insert(BOOK_NODE *book_st, BOOK_NODE *list)
     {
         follow -> next = newnode; /* 그 외 경우에는 앞 노드의 next에 연결 됨. */
     }
-
 
     return list;                /* 첫 번째 NODE를 가지고 있는 list를 return 한다. */
 }

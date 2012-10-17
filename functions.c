@@ -10,6 +10,7 @@ int menu_print()
         
     while(1)                    /* 메뉴는 종료를 선택할 때까지 반복해서 출력된다. */
     {
+        putchar('\n');
         printf("1.  Insert\n");
         printf("2.  List\n");
         printf("3.  Save as a data file\n");

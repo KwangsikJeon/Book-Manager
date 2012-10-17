@@ -87,7 +87,6 @@ BOOK_NODE *loading_data_file(BOOK_NODE *data)     /* 파일을 불러 들인다.
         
         return temp_return;     /* NULL 값을 다시 돌려주고 함수 종료. */
     }
-
         
     amount_books = checking_header(&infd); /* 헤더 검사를 한다. */
     if(amount_books < 0)                  /* 헤더 검사에서 오류 */
@@ -97,9 +96,6 @@ BOOK_NODE *loading_data_file(BOOK_NODE *data)     /* 파일을 불러 들인다.
     }
     else
     {
-        printf("Debugging, File Checking :: [OK]\n");
-        printf("Debugging, Amount of books :: [%d]\n", amount_books);
-        
         lseek(infd, 1 * sizeof(DBF_HEADER), SEEK_SET); /* 헤더 부분 만큼 지나간다. */
 
         for(i_counter = 1; amount_books >= i_counter; ++i_counter) /* 파일에서 데이터 구조체 단위로 뽑아서 메모리 적재 */
@@ -128,8 +124,6 @@ unsigned int checking_header(int *infd) /* 헤더를 검사하고 return 값으�
     }
     read(*infd, &header_temp, sizeof(DBF_HEADER)); /* 헤더 부분에서 매직 키에 접근. */
     amountBooks = header_temp.amount_of_book;         /* 갯수를 대입 */
-    
-    printf("Debugging, Returning of the record :: [%d]\n", header_temp.amount_of_book);
     
     strcpy(magic_key_from_file, header_temp.magic_number); /* 매직키를 추출하여 준비된 배열에 넣는다. */
     magic_key_from_file[30] = '\0';                        /* 마지막에 NULL을 넣어서 garbage 값을 방지 */
