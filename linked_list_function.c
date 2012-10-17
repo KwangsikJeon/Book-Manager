@@ -50,22 +50,18 @@ void *print_links(BOOK_NODE *linked_list)
 
     temp = linked_list;
 
-    printf("---------------------------------------------------------------------------------------------------------------\n");
-//    printf("===============================================================================================\n");
-    printf(" Book                         | Author            | Publisher         | Price             | Year              |\n");
-    printf("---------------------------------------------------------------------------------------------------------------\n");
+    printf("================= Book List =================\n");
     while(temp != NULL)
     {
-        printf("%30s", temp -> book);
-        printf("%20s", temp -> author);
-        printf("%20s", temp -> publisher);
-        printf("%20s", temp -> price);
-        printf("%20s\n", temp -> year);
-        printf("---------------------------------------------------------------------------------------------------------------\n");
+        putchar('\n');
+        printf("Book      : %s\n", temp -> book);
+        printf("Author    : %15s | ", temp -> author);
+        printf("Publisher : %15s\n", temp -> publisher);
+        printf("Price     : %15s | ", temp -> price);
+        printf("Year      : %15s\n", temp -> year);
+        
         temp = temp -> next;
     }
-//    printf("===============================================================================================\n");
-
     
     return;
 }
