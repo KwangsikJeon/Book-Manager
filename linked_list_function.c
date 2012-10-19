@@ -63,13 +63,6 @@ void *print_links(BOOK_NODE *linked_list)
     {
         while(1)
         {
-            /* 페이지 기능 */
-            if((i_cnt == 4) || (temp -> next == NULL)) /* 더 이상 출력할 책이 없거나 네 권 단위로 출력 후, 빠져나간다. */
-            {
-                i_cnt = 0;      /* 다음 책들을 위해 카운트 초기화 */
-                break;
-            }
-            
             putchar('\n');
             printf("#%d\n", i_book_number);
             printf("Book      : %s\n", temp -> book);
@@ -77,7 +70,14 @@ void *print_links(BOOK_NODE *linked_list)
             printf("Publisher : %15s\n", temp -> publisher);
             printf("Price     : %15s | ", temp -> price);
             printf("Year      : %15s\n", temp -> year);
-        
+
+            /* 페이지 기능 */
+            if((i_cnt == 4) || (temp -> next == NULL)) /* 더 이상 출력할 책이 없거나 네 권 단위로 출력 후, 빠져나간다. */
+            {
+                i_cnt = 0;      /* 다음 책들을 위해 카운트 초기화 */
+                break;
+            }
+            
             temp = temp -> next;
 
             ++i_book_number;
