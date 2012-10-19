@@ -44,7 +44,10 @@ BOOK_NODE *insert(BOOK_NODE *book_st, BOOK_NODE *list)
 void *print_links(BOOK_NODE *linked_list)
 {
     BOOK_NODE *temp;
-    int iCnt = 1;
+
+    int i_cnt = 0;              /* 출력한 도서를 카운트 */
+    int i_book_number = 1;      /* 출력시 책에 번호를 위한 카운트 */
+    char c_cmd = 0;
     
     temp = linked_list;
 
@@ -54,21 +57,38 @@ void *print_links(BOOK_NODE *linked_list)
 
         return;
     }
-    
+
     printf("================= Book List =================\n");
-    while(temp != NULL)
+    while('q' != c_cmd)         /* 입력으로 'q' 를 받으면 빠져나간다. */
     {
-        putchar('\n');
-        printf("#%d\n", iCnt);
-        printf("Book      : %s\n", temp -> book);
-        printf("Author    : %15s | ", temp -> author);
-        printf("Publisher : %15s\n", temp -> publisher);
-        printf("Price     : %15s | ", temp -> price);
-        printf("Year      : %15s\n", temp -> year);
+        while(1)
+        {
+            /* 페이지 기능 */
+            if((i_cnt == 4) || (temp -> next == NULL)) /* 더 이상 출력할 책이 없거나 네 권 단위로 출력 후, 빠져나간다. */
+            {
+                i_cnt = 0;      /* 다음 책들을 위해 카운트 초기화 */
+                break;
+            }
+            
+            putchar('\n');
+            printf("#%d\n", i_book_number);
+            printf("Book      : %s\n", temp -> book);
+            printf("Author    : %15s | ", temp -> author);
+            printf("Publisher : %15s\n", temp -> publisher);
+            printf("Price     : %15s | ", temp -> price);
+            printf("Year      : %15s\n", temp -> year);
         
-        temp = temp -> next;
-        ++iCnt;
+            temp = temp -> next;
+
+            ++i_book_number;
+            ++i_cnt;
+        }
+
+        /* 명령을 받을 상태 메뉴 출력 */
+        printf("(p)revious, (Enter Key) for next page, (q)uit > ");
+        c_cmd = getchar();
     }
+    __fpurge(stdin);            /* 다음 메뉴 출력에서 입력이 두번 들어가는 것을 방지한다. */
     
     return;
 }
