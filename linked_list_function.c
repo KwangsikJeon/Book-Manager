@@ -85,7 +85,7 @@ void *print_links(BOOK_NODE *linked_list)
         }
 
         /* 명령을 받을 상태 메뉴 출력 */
-        printf("(p)revious, (Enter Key) for next page, (q)uit > ");
+        printf("(p)revious, (Enter Key) for next page, (q)uit :: %d / %d > ", i_book_number, counting_links(linked_list));
         c_cmd = getchar();
     }
     __fpurge(stdin);            /* 다음 메뉴 출력에서 입력이 두번 들어가는 것을 방지한다. */
