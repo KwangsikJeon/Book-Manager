@@ -44,13 +44,22 @@ BOOK_NODE *insert(BOOK_NODE *book_st, BOOK_NODE *list)
 void *print_links(BOOK_NODE *linked_list)
 {
     BOOK_NODE *temp;
-
+    int iCnt = 1;
+    
     temp = linked_list;
 
+    if(temp == NULL)            /* 책이 없을 경우 없다는 메세지를 띄우고 return 한다. */
+    {
+        printf("\nThere is no book to show in book list.\n");
+
+        return;
+    }
+    
     printf("================= Book List =================\n");
     while(temp != NULL)
     {
         putchar('\n');
+        printf("#%d\n", iCnt);
         printf("Book      : %s\n", temp -> book);
         printf("Author    : %15s | ", temp -> author);
         printf("Publisher : %15s\n", temp -> publisher);
@@ -58,6 +67,7 @@ void *print_links(BOOK_NODE *linked_list)
         printf("Year      : %15s\n", temp -> year);
         
         temp = temp -> next;
+        ++iCnt;
     }
     
     return;
